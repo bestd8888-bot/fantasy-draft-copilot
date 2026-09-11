@@ -12,6 +12,22 @@ Chrome MV3 擴充功能：在 Yahoo Fantasy Basketball Draft Room 旁邊顯示�
 
 ## 快速開始
 
+### 給沒裝過開發環境的朋友（最簡單）
+
+不需要 `npm install`，直接用打包好的 zip：
+
+1. 到 `release/` 資料夾拿 `fantasy-draft-copilot.zip` 和 `安裝說明.md`
+2. 照 `安裝說明.md` 的步驟裝（解壓縮 → `chrome://extensions` → 開發人員模式 → 載入未封裝項目）
+
+要更新分享用的 zip：
+
+```bash
+npm run build
+cd dist && zip -rq ../release/fantasy-draft-copilot.zip . -x ".*" && cd ..
+```
+
+### 給會跑指令的人
+
 ```bash
 npm install
 npm run build

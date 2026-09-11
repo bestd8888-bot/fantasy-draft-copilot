@@ -4,3 +4,4 @@ dist/
 test-results/
 *.local
 *.DS_Store
+release/*.zip
