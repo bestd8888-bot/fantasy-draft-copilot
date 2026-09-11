@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Draft Room — virtualized available list</title>
+  </head>
+  <body data-draft-copilot="fixture">
+    <span data-test="draft-round">Round 2</span>
+    <span data-test="current-pick">Pick 14</span>
+
+    <main data-test="draft-board">
+      <section data-test="draft-results">
+        <ul>
+          <li data-test="pick-row" data-pick="1"><span>1.1</span> Andre Jessup <span>BOS - PG,SG</span></li>
+          <li data-test="pick-row" data-pick="2"><span>1.2</span> Marcus Kovac <span>DEN - PF,C</span></li>
+        </ul>
+      </section>
+
+      <section data-test="my-team"><ul></ul></section>
+
+      <!-- Only the visible window is rendered: 2 of 400 players. -->
+      <section data-test="player-list" style="height: 120px; overflow: auto">
+        <div style="height: 8000px">
+          <table>
+            <tbody>
+              <tr data-test="player-row" data-player-id="y-2001"><td>Caleb Lindqvist</td><td>PHX - SG,SF</td></tr>
+              <tr data-test="player-row" data-player-id="y-2002"><td>Omar Pellini</td><td>MIA - PG</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

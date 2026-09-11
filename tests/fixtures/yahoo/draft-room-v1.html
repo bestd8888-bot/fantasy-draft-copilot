@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Draft Room — fixture v1</title>
+  </head>
+  <body data-draft-copilot="fixture">
+    <header>
+      <span data-test="draft-round">Round 3</span>
+      <span data-test="current-pick">On the clock: Pick 27</span>
+      <span data-test="draft-timer">0:48</span>
+      <span>12-team league · 9 CAT</span>
+    </header>
+
+    <main data-test="draft-board">
+      <section data-test="draft-results">
+        <ul>
+          <li data-test="pick-row" data-pick="1" data-team-id="t1">
+            <span>1.1</span><span data-test="player-name">Andre Jessup</span><span>BOS - PG,SG</span>
+            <span data-test="team-name">Team One</span>
+          </li>
+          <li data-test="pick-row" data-pick="2" data-team-id="t2">
+            <span>1.2</span><span data-test="player-name">Marcus Kovac</span><span>DEN - PF,C</span>
+            <span data-test="team-name">Team Two</span>
+          </li>
+          <li data-test="pick-row" data-pick="3" data-team-id="t3" data-my-team="true">
+            <span>1.3</span><span data-test="player-name">Silas Okafor</span><span>MIL - C</span>
+            <span data-test="team-name">My Squad</span>
+          </li>
+          <li data-test="pick-row" data-pick="4" data-team-id="t4">
+            <span>1.4</span><span data-test="player-name">Teddy Vasquez</span><span>NYK - SF,PF</span>
+            <span data-test="team-name">Team Four</span>
+          </li>
+          <li data-test="pick-row" data-pick="22" data-team-id="t3" data-my-team="true">
+            <span>2.10</span><span data-test="player-name">Nikola Jokić</span><span>DEN - C</span>
+            <span data-test="team-name">My Squad</span>
+          </li>
+        </ul>
+      </section>
+
+      <section data-test="my-team">
+        <ul>
+          <li data-test="player-row" data-player-id="y-1003">
+            <span data-test="player-name">Silas Okafor</span><span>MIL - C</span>
+          </li>
+          <li data-test="player-row" data-player-id="y-1022">
+            <span data-test="player-name">Nikola Jokić</span><span>DEN - C</span>
+          </li>
+        </ul>
+      </section>
+
+      <section data-test="player-list" aria-label="Available Players">
+        <table>
+          <tbody>
+            <tr data-test="player-row" data-player-id="y-2001" data-adp="28.5" data-rank="25">
+              <td data-test="player-name">Caleb Lindqvist</td>
+              <td>PHX - SG,SF</td>
+              <td data-test="injury-status">GTD</td>
+            </tr>
+            <tr data-test="player-row" data-player-id="y-2002" data-adp="31.0" data-rank="30">
+              <td data-test="player-name">Omar Pellini</td>
+              <td>MIA - PG</td>
+              <td></td>
+            </tr>
+            <tr data-test="player-row" data-player-id="y-2003" data-adp="33.5" data-rank="34">
+              <td data-test="player-name">Jaren Whitfield Jr.</td>
+              <td>ORL - PF,C</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

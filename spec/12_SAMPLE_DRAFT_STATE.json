@@ -1,0 +1,47 @@
+{
+  "platform": "yahoo",
+  "sessionId": "demo-session",
+  "league": {
+    "teams": 12,
+    "draftType": "snake",
+    "scoring": "9cat",
+    "categories": [
+      "FG%",
+      "FT%",
+      "3PM",
+      "PTS",
+      "REB",
+      "AST",
+      "STL",
+      "BLK",
+      "TO"
+    ],
+    "secondsPerPick": 60
+  },
+  "currentRound": 3,
+  "currentPick": 27,
+  "myDraftSlot": 3,
+  "nextMyPick": 27,
+  "picksUntilMe": 0,
+  "drafted": [],
+  "myRoster": [],
+  "available": [],
+  "strategy": {
+    "mode": "auto",
+    "punts": {
+      "FG%": "none",
+      "FT%": "none",
+      "3PM": "none",
+      "PTS": "none",
+      "REB": "none",
+      "AST": "none",
+      "STL": "none",
+      "BLK": "none",
+      "TO": "none"
+    },
+    "lockedCategories": [],
+    "confidence": 0
+  },
+  "updatedAt": 0,
+  "parserStatus": "ok"
+}

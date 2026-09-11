@@ -1,0 +1,43 @@
+[
+  {
+    "player_id": "demo_001",
+    "name": "Demo Guard",
+    "team": "AAA",
+    "positions": ["PG", "SG"],
+    "gp": 72,
+    "mpg": 34.1,
+    "fg_pct": 0.468,
+    "fga": 16.2,
+    "ft_pct": 0.871,
+    "fta": 5.4,
+    "three_pm": 2.7,
+    "pts": 22.4,
+    "reb": 4.1,
+    "ast": 7.8,
+    "stl": 1.5,
+    "blk": 0.3,
+    "tov": 2.8,
+    "adp": 42
+  },
+  {
+    "player_id": "demo_003",
+    "name": "Demo Center",
+    "team": "CCC",
+    "positions": ["C"],
+    "gp": 70,
+    "mpg": 31.5,
+    "fg_pct": 0.596,
+    "fga": 10.9,
+    "ft_pct": 0.681,
+    "fta": 6.0,
+    "three_pm": 0.2,
+    "pts": 17.5,
+    "reb": 10.8,
+    "ast": 2.2,
+    "stl": 0.8,
+    "blk": 2.1,
+    "tov": 2.5,
+    "adp": 63,
+    "injury_status": "GTD"
+  }
+]

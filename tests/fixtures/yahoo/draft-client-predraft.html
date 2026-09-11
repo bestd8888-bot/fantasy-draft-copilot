@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Yahoo Fantasy Basketball Draft — pre-draft lobby</title>
+  </head>
+  <!--
+    Reproduces the real basketball.fantasysports.yahoo.com/draftclient markup as
+    captured 2026-09: atomic CSS classes, hashed module classes, `.ys-player`
+    cells keyed by `data-id`, season-total stat columns, and a status line split
+    across sibling spans.
+  -->
+  <body data-draft-copilot="fixture">
+    <div class="_ys_bgunxp _ys_wg6cuv">
+      <div class="D(f) Ai(c)">
+        <span class="_ys_1q9oeop">00:26</span>
+        <span class="_ys_thcz89">Draft Starting Soon</span>
+      </div>
+      <div class="D(f) Fld(c)">Last Pick will appear here.</div>
+    </div>
+
+    <div class="D(f) Fld(c)">
+      <!-- Right-hand roster panel. Note the roster cells carry NO
+           data-i13n-module, exactly like the live client, and the slot labels
+           use <abbr title> — which the page ALSO uses for NBA team names. -->
+      <div class="D(f) Fld(c) W(23%)">
+        <div class="_ys_1vj86om">YOUR TEAM (0/13)</div>
+        <div class="Fxg(1) Ovy(a) Pb(16px)">
+            <div class="_ys_9w258l"><abbr title="Point Guard"><span>PG</span></abbr></div>
+          <div class="_ys_9w258l"><abbr title="Shooting Guard"><span>SG</span></abbr></div>
+          <div class="_ys_9w258l"><abbr title="Center"><span>C</span></abbr></div>
+        </div>
+      </div>
+
+      <!-- Pick activity feed, still empty before the first pick. -->
+      <div class="Fxg(1) Ovy(a) Ovx(h)"></div>
+
+      <table>
+        <tbody>
+          <tr>
+            <td>Queue</td><td>Player</td><td>XRank</td><td>Rank</td><td>💎 L7ADP</td>
+            <td>GP</td><td>FG%</td><td>FT%</td><td>3PTM</td><td>PTS</td><td>REB</td>
+            <td>AST</td><td>ST</td><td>BLK</td><td>TO</td>
+          </tr>
+
+          <tr>
+            <td><div class="D(f) Jc(c) ys-addqueue" data-id="6550" data-i13n-module="player-list"><button></button></div></td>
+            <td>
+              <div class="W(150px) Ov(h)">
+                <div class="ys-player" data-id="6550" data-i13n-module="player-list">
+                  <div class="D(f) Fld(c) Fxg(1) Miw(0)">
+                    <div class="D(f) Ai(c) Gp(4px) Miw(0)">
+                      <span class="_ys_qoenog">F. Wagner</span>
+                      <div title="Injured: Game Time Decision" class="_ys_p0raia">GTD</div>
+                    </div>
+                    <div class="D(f) Ai(c)"><span>SF,PF</span><span>ORL</span></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>45</td><td>43</td><td>53.7</td><td>67</td><td>.485</td><td>.848</td>
+            <td>112</td><td>1623</td><td>384</td><td>283</td><td>77</td><td>24</td><td>141</td>
+          </tr>
+
+          <tr>
+            <td><div class="ys-addqueue" data-id="6018"><button></button></div></td>
+            <td>
+              <div class="W(150px) Ov(h)">
+                <div class="ys-player" data-id="6018" data-i13n-module="player-list">
+                  <div class="D(f) Fld(c)">
+                    <div class="D(f) Ai(c) Gp(4px)"><span class="_ys_qoenog">A. Thompson</span></div>
+                    <div class="D(f) Ai(c)"><span>PG,SG</span><span>HOU</span></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>52</td><td>49</td><td>58.1</td><td>74</td><td>.531</td><td>.702</td>
+            <td>58</td><td>1102</td><td>530</td><td>398</td><td>102</td><td>60</td><td>160</td>
+          </tr>
+
+          <tr class="_ys_bgunxp"><td colspan="15">YOUR TURN - 12TH PICK</td></tr>
+          <tr class="_ys_bgunxp"><td colspan="15">YOUR TURN - 13TH PICK</td></tr>
+
+          <tr>
+            <td><div class="ys-addqueue" data-id="7103"><button></button></div></td>
+            <td>
+              <div class="W(150px) Ov(h)">
+                <div class="ys-player" data-id="7103" data-i13n-module="player-list">
+                  <div class="D(f) Fld(c)">
+                    <div class="D(f) Ai(c) Gp(4px)"><span class="_ys_qoenog">W. Kessler</span></div>
+                    <div class="D(f) Ai(c)"><span>C</span><span>LAL</span></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>61</td><td>66</td><td>64.2</td><td>70</td><td>.612</td><td>.518</td>
+            <td>4</td><td>812</td><td>702</td><td>119</td><td>39</td><td>168</td><td>98</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="_ys_9w258l">
+        <div class="ys-player" data-id="10265" data-i13n-module="draft-scout">
+          <div class="D(f) Ai(c) Gp(4px)"><span>M. Buzelis</span></div>
+          <div><span>SF,PF</span><span>CHI</span></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
