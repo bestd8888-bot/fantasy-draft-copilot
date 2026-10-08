@@ -1,14 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Fantasy Draft AI Copilot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Read-only Yahoo Fantasy Basketball draft room copilot: live 9-CAT recommendations, punt detection and roster fit.",
   "minimum_chrome_version": "114",
-  "permissions": ["storage"],
-  "host_permissions": ["https://basketball.fantasysports.yahoo.com/*"],
-  "background": { "service_worker": "background.js" },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://basketball.fantasysports.yahoo.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "options_page": "options/index.html",
-  "action": { "default_title": "Fantasy Draft AI Copilot" },
+  "action": {
+    "default_title": "Fantasy Draft AI Copilot"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -17,10 +25,14 @@
         "http://127.0.0.1/*",
         "file:///*"
       ],
-      "js": ["content.js"],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle",
       "all_frames": false
     }
   ],
-  "icons": { "128": "icons/icon128.png" }
+  "icons": {
+    "128": "icons/icon128.png"
+  }
 }
