@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #11141d; color: #eef1f7; font-family: "Work Sans", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif; }
+  .slide { width: 1280px; height: 800px; position: relative; overflow: hidden; display: none;
+    background: radial-gradient(760px 520px at 78% 18%, rgba(226,136,63,.16), transparent 65%), #11141d; }
+  .slide.on { display: grid; }
+  .split { grid-template-columns: 1fr 470px; align-items: center; gap: 56px; padding: 0 84px; }
+  .eyebrow { font-family: Oswald, sans-serif; font-weight: 600; font-size: 18px; letter-spacing: .16em; color: #e2883f; text-transform: uppercase; }
+  h1 { font-family: Oswald, "PingFang TC", sans-serif; font-weight: 700; font-size: 62px; line-height: 1.12; margin-top: 18px; }
+  h1 .a { color: #e2883f; }
+  p.lede { margin-top: 24px; font-size: 22px; line-height: 1.6; color: #a3aec0; max-width: 30ch; }
+  ul { list-style: none; padding: 0; margin-top: 30px; display: grid; gap: 14px; }
+  li { font-size: 19px; color: #c8d0dc; display: flex; gap: 12px; }
+  li b { color: #35c37d; }
+  .shot { display: flex; justify-content: center; align-items: center; height: 800px; }
+  .shot img { border-radius: 16px; box-shadow: 0 30px 70px -20px rgba(0,0,0,.7), 0 0 0 1px #2a3140; }
+  .tall img { height: 740px; }
+  .med img { height: 720px; width: auto; }
+  .options { padding: 0; }
+  .options img { width: 1280px; height: 800px; }
+  .tile { width: 440px; height: 280px; display: none; padding: 30px 32px; position: relative;
+    background: radial-gradient(300px 220px at 85% 10%, rgba(226,136,63,.25), transparent 70%), #11141d; }
+  .tile.on { display: block; }
+  .tile .logo { width: 64px; height: 64px; }
+  .tile h2 { font-family: Oswald, sans-serif; font-weight: 700; font-size: 34px; margin-top: 18px; line-height: 1.05; }
+  .tile p { margin-top: 10px; font-size: 16px; color: #a3aec0; }
+</style></head><body>
+
+<section class="slide split" id="s1">
+  <div>
+    <div class="eyebrow">Yahoo Fantasy Basketball</div>
+    <h1>選秀時<br>即時算出<span class="a">最該選誰</span></h1>
+    <p class="lede">讀取選秀室畫面，用 9-CAT、陣容缺口、位置稀缺性幫你排序 —— 不是只看總排名。</p>
+    <ul>
+      <li><b>✓</b>只讀畫面，不會幫你按 Draft</li>
+      <li><b>✓</b>推薦引擎在你的電腦上運算</li>
+      <li><b>✓</b>不需要帳號、不需要匯入資料</li>
+    </ul>
+  </div>
+  <div class="shot tall"><img src="raw/panel-main.png"></div>
+</section>
+
+<section class="slide split" id="s2">
+  <div>
+    <div class="eyebrow">不是黑箱</div>
+    <h1>每一個推薦<br>都<span class="a">拆給你看</span></h1>
+    <p class="lede">點開候選人，看陣容契合度、位置稀缺性、ADP 價值、預計出場數，以及九項 category 各自的影響。</p>
+    <ul>
+      <li><b>✓</b>依預計出場場數折算</li>
+      <li><b>✓</b>FG% / FT% 依出手量加權</li>
+      <li><b>✓</b>你能標記「看好 / 看衰 / 風險」</li>
+    </ul>
+  </div>
+  <div class="shot med"><img src="raw/panel-detail-crop.png"></div>
+</section>
+
+<section class="slide options" id="s3"><img src="raw/options.png"></section>
+
+<section class="tile" id="tile">
+  <img class="logo" src="../public/icons/icon128.png">
+  <h2>Fantasy Draft<br>AI Copilot</h2>
+  <p>Yahoo 選秀室即時推薦</p>
+</section>
+
+<script>
+  const id = new URLSearchParams(location.search).get("s");
+  document.getElementById(id).classList.add("on");
+</script>
+</body></html>
