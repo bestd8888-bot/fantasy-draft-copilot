@@ -73,8 +73,9 @@ export const draftPickSchema = z.object({
 });
 
 export const strategySchema = z.object({
-  mode: z.enum(["auto", "manual"]),
+  mode: z.enum(["suggest", "auto", "manual"]),
   punts: z.record(categorySchema, puntLevelSchema),
+  suggestedPunts: z.record(categorySchema, puntLevelSchema).optional(),
   lockedCategories: z.array(categorySchema),
   buildLabel: z.string().optional(),
   confidence: z.number().min(0).max(1),

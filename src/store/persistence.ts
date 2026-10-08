@@ -79,7 +79,7 @@ export async function writeKey(key: string, value: unknown): Promise<void> {
 }
 
 export async function loadSettings(): Promise<AppSettings> {
-  const stored = await readKey<Partial<AppSettings>>(STORAGE_KEYS.settings, {});
+  const stored = migrateSettings(await readKey<Partial<AppSettings>>(STORAGE_KEYS.settings, {}));
   return {
     ...DEFAULT_SETTINGS,
     ...stored,
@@ -87,6 +87,21 @@ export async function loadSettings(): Promise<AppSettings> {
     weights: { ...DEFAULT_SETTINGS.weights, ...stored.weights },
     manualPunts: { ...DEFAULT_SETTINGS.manualPunts, ...stored.manualPunts },
     llm: { ...DEFAULT_SETTINGS.llm, ...stored.llm },
+  };
+}
+
+/**
+ * v1 -> v2: "auto" punting used to be the default, so a stored "auto" almost
+ * always means "never touched", not a choice. It moves to the new default,
+ * "suggest". A user who later picks "auto" again is on v2 and keeps it.
+ */
+export function migrateSettings(stored: Partial<AppSettings>): Partial<AppSettings> {
+  if (Object.keys(stored).length === 0) return stored;
+  if ((stored.settingsVersion ?? 1) >= 2) return stored;
+  return {
+    ...stored,
+    strategyMode: stored.strategyMode === "auto" ? "suggest" : stored.strategyMode,
+    settingsVersion: 2,
   };
 }
 

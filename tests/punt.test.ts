@@ -156,3 +156,33 @@ describe("category standing model", () => {
     expect(six.PTS).toBeLessThan(two.PTS);
   });
 });
+
+describe("suggest mode (default)", () => {
+  it("detects the build but applies no punts to the scores", () => {
+    const { strategy } = detectPunts({
+      roster: [bigMan("Big A"), bigMan("Big B"), bigMan("Big C")],
+      available: pool,
+      stats,
+      league: DEFAULT_LEAGUE,
+      round: 5,
+      mode: "suggest",
+      manualPunts: { ...NO_PUNTS },
+      lockedCategories: [],
+    });
+    expect(strategy.mode).toBe("suggest");
+    expect(Object.values(strategy.punts).every((l) => l === "none")).toBe(true);
+    expect(strategy.suggestedPunts?.["FT%"]).not.toBe("none");
+    expect(strategy.buildLabel).toContain("建議");
+  });
+});
+
+describe("settings migration", () => {
+  it("moves the old untouched 'auto' default to 'suggest' and leaves real choices alone", async () => {
+    const { migrateSettings } = await import("@/store/persistence");
+    expect(migrateSettings({ strategyMode: "auto" }).strategyMode).toBe("suggest");
+    expect(migrateSettings({ strategyMode: "manual" }).strategyMode).toBe("manual");
+    // A v2 user who deliberately picked auto keeps it.
+    expect(migrateSettings({ strategyMode: "auto", settingsVersion: 2 }).strategyMode).toBe("auto");
+    expect(migrateSettings({})).toEqual({});
+  });
+});

@@ -20,6 +20,7 @@ import {
   type Projection,
   type PuntLevel,
   type SessionOverrides,
+  type StrategyMode,
 } from "@/shared/types";
 import { buildDraftState } from "./buildDraftState";
 import { loadNotes, loadSession, saveNotes, saveSession } from "./persistence";
@@ -67,7 +68,7 @@ export interface DraftStoreState {
   addToMyRoster: (playerId: string) => void;
   setPunt: (category: Category, level: PuntLevel) => void;
   setNote: (playerId: string, name: string, tag: NoteTag | "clear") => void;
-  setStrategyMode: (mode: "auto" | "manual") => void;
+  setStrategyMode: (mode: StrategyMode) => void;
   ingest: (snapshot: AdapterSnapshot, platform: DraftState["platform"], sessionId: string) => void;
   recompute: () => void;
 }

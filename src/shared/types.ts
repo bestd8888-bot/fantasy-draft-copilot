@@ -65,9 +65,24 @@ export interface DraftPick {
   timestamp?: number;
 }
 
+/**
+ * How punt strategy reaches the scores.
+ *   suggest — detect and show the build, but score as if nothing is punted (default)
+ *   auto    — detect and apply the detected punts to the scores
+ *   manual  — apply exactly the punts the user set
+ *
+ * "suggest" is the default because simulation found auto-applied punting LOST
+ * about 0.1 head-to-head categories per week versus not punting, consistently
+ * across market conditions. A deliberate punt is still one click away.
+ */
+export type StrategyMode = "suggest" | "auto" | "manual";
+
 export interface StrategyState {
-  mode: "auto" | "manual";
+  mode: StrategyMode;
+  /** Punts that actually weight the scores. */
   punts: Record<Category, PuntLevel>;
+  /** In suggest mode: what auto-detection would have punted. */
+  suggestedPunts?: Record<Category, PuntLevel>;
   lockedCategories: Category[];
   buildLabel?: string;
   confidence: number;
@@ -240,7 +255,9 @@ export interface AppSettings {
   quickModeThreshold: number;
   /** 0 = judge players purely per game, 1 = judge them on projected season totals. */
   availabilityWeight: number;
-  strategyMode: "auto" | "manual";
+  strategyMode: StrategyMode;
+  /** Bumped when a default changes in a way stored settings must migrate. */
+  settingsVersion?: number;
   manualPunts: Record<Category, PuntLevel>;
   llm: LlmSettings;
   devInspector: boolean;
@@ -290,7 +307,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   weights: DEFAULT_WEIGHTS,
   quickModeThreshold: 3,
   availabilityWeight: 0.5,
-  strategyMode: "auto",
+  strategyMode: "suggest",
+  settingsVersion: 2,
   manualPunts: { ...NO_PUNTS },
   llm: { enabled: false, provider: "none", model: "gpt-4o-mini", timeoutMs: 3000 },
   devInspector: false,

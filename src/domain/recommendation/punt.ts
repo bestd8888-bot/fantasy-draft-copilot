@@ -5,6 +5,7 @@ import {
   type LeagueSettings,
   type Player,
   type PuntLevel,
+  type StrategyMode,
   type StrategyState,
 } from "@/shared/types";
 import { clamp, normalCdf } from "@/shared/util";
@@ -16,7 +17,7 @@ export interface PuntInput {
   stats: PoolStats;
   league: LeagueSettings;
   round: number;
-  mode: "auto" | "manual";
+  mode: StrategyMode;
   manualPunts: Record<Category, PuntLevel>;
   lockedCategories: Category[];
 }
@@ -121,6 +122,22 @@ export function detectPunts(input: PuntInput): { strategy: StrategyState; profil
 
   const puntedCount = CATEGORIES.filter((c) => punts[c] !== "none").length;
   const confidence = puntedCount === 0 ? clamp(rostered / 6) : clamp(0.35 + 0.12 * rostered + 0.1 * puntedCount);
+
+  if (mode === "suggest") {
+    // Detected, shown, but not applied: the scores stay punt-neutral.
+    const anything = CATEGORIES.some((c) => punts[c] !== "none");
+    return {
+      strategy: {
+        mode: "suggest",
+        punts: { ...NO_PUNTS },
+        suggestedPunts: punts,
+        lockedCategories,
+        buildLabel: anything ? `建議：${describeBuild(punts, round)}` : describeBuild(punts, round),
+        confidence,
+      },
+      profile,
+    };
+  }
 
   return {
     strategy: {

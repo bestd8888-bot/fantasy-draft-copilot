@@ -303,10 +303,11 @@ export function OptionsApp() {
           <select
             value={settings.strategyMode}
             style={{ width: 180 }}
-            onChange={(e) => setSettings({ ...settings, strategyMode: e.target.value as "auto" | "manual" })}
+            onChange={(e) => setSettings({ ...settings, strategyMode: e.target.value as AppSettings["strategyMode"] })}
           >
-            <option value="auto">Auto（引擎偵測）</option>
-            <option value="manual">Manual（我自己鎖定）</option>
+            <option value="suggest">只建議（推薦）</option>
+            <option value="auto">自動套用</option>
+            <option value="manual">手動鎖定</option>
           </select>
         </div>
         <div className="punt-grid">
@@ -315,7 +316,7 @@ export function OptionsApp() {
               <strong>{category}</strong>
               <select
                 value={settings.manualPunts[category]}
-                disabled={settings.strategyMode === "auto"}
+                disabled={settings.strategyMode !== "manual"}
                 onChange={(e) =>
                   setSettings({
                     ...settings,
@@ -331,7 +332,12 @@ export function OptionsApp() {
             </div>
           ))}
         </div>
-        <p className="hint">Auto 模式下，第 1–2 輪不會鎖定 punt；第 3 輪起才允許 soft，第 5 輪起才允許 hard。</p>
+        <p className="hint">
+          <b>只建議</b>：偵測並顯示建隊方向，但分數照常計算，不放棄任何 category。
+          模擬 144 場選秀的結果，自動套用 punt 平均每週少贏約 0.1 類，所以預設不套用。
+          你有明確的 punt 計畫時再切到「手動鎖定」。
+          自動偵測在第 1–2 輪不會判定 punt；第 3 輪起才可能 soft，第 5 輪起才可能 hard。
+        </p>
       </section>
 
       <section className="card">

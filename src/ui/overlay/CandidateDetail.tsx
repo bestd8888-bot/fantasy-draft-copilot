@@ -64,7 +64,7 @@ export function CandidateDetail({
           <span>Reach</span>
           <span>{recommendation.reachLabel}</span>
         </div>
-        <div className="dc-kv">
+        <div className="dc-kv" title="你下一次能選時他還在的機率；20% 以下實際通常更低">
           <span>撐到下一手</span>
           <span>{Math.round(recommendation.survivalToNextPick * 100)}%</span>
         </div>

@@ -33,4 +33,12 @@ describe("on the clock", () => {
     expect(Math.max(...survivals)).toBeGreaterThan(0.3); // deep players can wait
     expect(Math.min(...survivals)).toBeLessThan(0.5); // the top of the board cannot
   });
+
+  it("flags back-to-back picks at a snake turn", () => {
+    // Slot 12 picks 60 and 61; slot 7 does not.
+    const turn = recommend(makeState({ available: pool, currentRound: 5, currentPick: 60, myDraftSlot: 12, picksUntilMe: 0 }));
+    const mid = recommend(makeState({ available: pool, currentRound: 5, currentPick: 55, myDraftSlot: 7, picksUntilMe: 0 }));
+    expect(turn.backToBack).toBe(true);
+    expect(mid.backToBack).toBe(false);
+  });
 });

@@ -145,6 +145,11 @@ export function OverlayApp({ mockControls, onOpenInspector }: Props) {
         )}
         {lastError && <div className="dc-banner dc-banner-warn">{lastError}</div>}
 
+        {!disabled && result?.backToBack && (state.picksUntilMe ?? 99) <= settings.quickModeThreshold && (
+          <div className="dc-banner dc-banner-info" role="status">
+            🔁 你這手跟下一手連著選，中間沒有人選 —— 推薦的前兩名都拿得到。
+          </div>
+        )}
         {!disabled && quickMode && (
           <QuickMode
             recommendations={recommendations}

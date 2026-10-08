@@ -40,7 +40,10 @@ export function BestPickCard({ recommendation, ai, aiStatus, quickMode, onSelect
         <span className={`dc-tag ${recommendation.reachLabel === "Great Value" ? "dc-tag-good" : recommendation.reachLabel.includes("Reach") ? "dc-tag-warn" : ""}`}>
           {recommendation.reachLabel}
         </span>
-        <span className={`dc-tag ${survival < 20 ? "dc-tag-warn" : "dc-tag-info"}`} title="下一手還在的機率">
+        <span
+          className={`dc-tag ${survival < 20 ? "dc-tag-warn" : "dc-tag-info"}`}
+          title="你下一次能選時他還在的機率。低段偏樂觀：顯示 20% 以下時，實際通常更低，當作會被搶走。"
+        >
           撐到下一手 {survival}%
         </span>
         {momentum >= 0.35 && (
