@@ -119,6 +119,11 @@ export function OverlayApp({ mockControls, onOpenInspector }: Props) {
             ⚠️ Draft data may be stale — Yahoo page structure changed (confidence {health.confidence.toFixed(2)})
           </div>
         )}
+        {(state.configNotices ?? []).map((notice) => (
+          <div className="dc-banner dc-banner-info" key={notice} role="status">
+            {notice}
+          </div>
+        ))}
         {(state.configWarnings ?? []).map((warning) => (
           <div className="dc-banner dc-banner-error" key={warning} role="alert">
             {warning}
@@ -137,7 +142,9 @@ export function OverlayApp({ mockControls, onOpenInspector }: Props) {
         ))}
         {missingProjections && (
           <div className="dc-banner dc-banner-warn">
-            Projection unavailable — using ranking-only fallback. 請到設定頁匯入 CSV/JSON。
+            {state.platform === "yahoo"
+              ? "讀不到球員投影數據，目前只能照排名推薦。請把 Players 表格的 stat 下拉選單切到季度投影（例如 2026-27 Proj Stats）。"
+              : "讀不到球員投影數據，目前只能照排名推薦。請到設定頁匯入 CSV/JSON。"}
           </div>
         )}
         {aiStatus === "error" && settings.llm.enabled && (
@@ -177,7 +184,13 @@ export function OverlayApp({ mockControls, onOpenInspector }: Props) {
               onSelect={select}
             />
             {result && <StrategyBadge strategy={result.strategy} onTogglePunt={onTogglePunt} />}
-            {result && <CategoryStrength percentiles={result.categoryPercentiles} strategy={result.strategy} />}
+            {result && (
+              <CategoryStrength
+                percentiles={result.categoryPercentiles}
+                strategy={result.strategy}
+                categories={state.league.categories}
+              />
+            )}
           </>
         )}
 

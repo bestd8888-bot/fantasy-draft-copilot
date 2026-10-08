@@ -129,6 +129,8 @@ export interface DraftState {
   sessionId: string;
   /** Settings that contradict what the page shows — not parser failures. */
   configWarnings?: string[];
+  /** Settings the page let us correct automatically for this draft. */
+  configNotices?: string[];
   league: LeagueSettings;
   currentRound: number;
   currentPick: number;

@@ -26,6 +26,8 @@ export interface BuildInput {
   persistedPicks?: DraftPick[];
   /** Projections seen earlier in this draft, keyed by provider id. */
   projectionCache?: Record<string, Projection>;
+  /** League sizes still consistent with everything the page has shown this draft. */
+  teamsCandidates?: number[];
 }
 
 function statusFromConfidence(confidence: number): ParserStatus {
@@ -42,8 +44,12 @@ function statusFromConfidence(confidence: number): ParserStatus {
  * enrich metadata such as ADP and injury status.
  */
 export function buildDraftState(input: BuildInput): DraftState {
-  const { snapshot, index, settings, overrides, sessionId, platform, projectionCache } = input;
-  const league = { ...settings.league, ...snapshot.league };
+  const { snapshot, index, settings, overrides, sessionId, platform, projectionCache, teamsCandidates } = input;
+  // Once the page has pinned the league size down to one value, trust it over
+  // the settings: a friend who never changed the default of 12 still gets
+  // correct snake math in a 10-team draft.
+  const detectedTeams = teamsCandidates?.length === 1 ? teamsCandidates[0] : undefined;
+  const league = { ...settings.league, ...snapshot.league, ...(detectedTeams ? { teams: detectedTeams } : {}) };
   const teams = league.teams;
 
   // --- drafted picks -------------------------------------------------------
@@ -189,7 +195,11 @@ export function buildDraftState(input: BuildInput): DraftState {
   return {
     platform,
     sessionId,
-    configWarnings: leagueSizeWarnings(snapshot.meta, league.teams),
+    configWarnings: detectedTeams ? [] : leagueSizeWarnings(snapshot.meta, league.teams, teamsCandidates),
+    configNotices:
+      detectedTeams && detectedTeams !== settings.league.teams
+        ? [`已依選秀室自動判斷為 ${detectedTeams} 隊（設定頁是 ${settings.league.teams} 隊，這場不用改）`]
+        : [],
     league,
     currentRound,
     currentPick,
@@ -248,6 +258,7 @@ function mergePlatformPlayer(
 export function leagueSizeWarnings(
   meta: { currentRound?: number; currentPick?: number },
   teams: number,
+  knownCandidates?: number[],
 ): string[] {
   const round = meta.currentRound;
   const pick = meta.currentPick;
@@ -255,8 +266,42 @@ export function leagueSizeWarnings(
   const consistent = (round - 1) * teams < pick && pick <= round * teams;
   if (consistent) return [];
 
-  const candidates: number[] = [];
-  for (let t = 4; t <= 20; t++) if ((round - 1) * t < pick && pick <= round * t) candidates.push(t);
+  const candidates =
+    knownCandidates && knownCandidates.length < 17
+      ? knownCandidates
+      : Array.from({ length: 17 }, (_, i) => i + 4).filter((t) => (round - 1) * t < pick && pick <= round * t);
   const hint = candidates.length ? `（依目前 Round ${round}、Pick ${pick} 推算應為 ${candidates.join(" / ")} 隊）` : "";
   return [`聯盟隊伍數設定為 ${teams} 隊，但跟選秀室對不上${hint}，請到設定頁修正`];
+}
+
+/**
+ * League sizes (4-20) consistent with what this snapshot shows.
+ *
+ * Two independent constraints:
+ *   - "Round R, Pick P": round R spans picks (R-1)T+1 .. RT.
+ *   - The user's own upcoming picks (the "YOUR TURN - Nth PICK" markers and the
+ *     "up in N picks" countdown) must all belong to ONE draft slot. In a 10-team
+ *     snake picks 44 and 57 share a slot; in a 9-team snake they do not.
+ * Intersected across snapshots, this usually settles on one size within a pick
+ * or two.
+ */
+export function teamCountCandidates(
+  meta: { currentRound?: number; currentPick?: number; picksUntilMe?: number; myPickNumbers?: number[] },
+  draftType: "snake" | "linear",
+): number[] {
+  const mine = [...(meta.myPickNumbers ?? [])];
+  if (meta.currentPick !== undefined && meta.picksUntilMe !== undefined) mine.push(meta.currentPick + meta.picksUntilMe);
+  const myPicks = [...new Set(mine)];
+
+  const out: number[] = [];
+  for (let teams = 4; teams <= 20; teams++) {
+    const { currentRound: round, currentPick: pick } = meta;
+    if (round && pick && !((round - 1) * teams < pick && pick <= round * teams)) continue;
+    if (myPicks.length >= 2) {
+      const slots = new Set(myPicks.map((p) => slotForOverallPick(p, { teams, draftType })));
+      if (slots.size !== 1) continue;
+    }
+    out.push(teams);
+  }
+  return out;
 }

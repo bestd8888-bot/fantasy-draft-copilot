@@ -55,7 +55,8 @@ export class YahooDraftAdapter implements DraftPlatformAdapter {
     });
 
     return {
-      league: this.parseLeague(),
+      // The table lists exactly the categories this league scores.
+      league: parsed.scoredCategories ? { categories: parsed.scoredCategories } : this.parseLeague(),
       meta: { ...parsed.meta, myDraftSlot: this.options.myDraftSlot ?? parsed.meta.myDraftSlot },
       drafted: [],
       myRoster: parsed.myRoster,

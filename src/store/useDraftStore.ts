@@ -22,7 +22,7 @@ import {
   type SessionOverrides,
   type StrategyMode,
 } from "@/shared/types";
-import { buildDraftState } from "./buildDraftState";
+import { buildDraftState, teamCountCandidates } from "./buildDraftState";
 import { loadNotes, loadSession, saveNotes, saveSession } from "./persistence";
 
 export interface DraftStoreState {
@@ -53,6 +53,8 @@ export interface DraftStoreState {
   notes: Record<string, PlayerNote>;
   /** Players the standardization baseline was built from, kept so it can be rebuilt. */
   baselinePool: Player[];
+  /** League sizes still consistent with every snapshot of this draft. */
+  teamsCandidates?: number[];
   lastError?: string;
   selectedPlayerId?: string;
   quickMode: boolean;
@@ -192,6 +194,14 @@ export const useDraftStore = create<DraftStoreState>((set, get) => ({
     const { index, settings, overrides, persistedPicks } = get();
     try {
       const projectionCache = harvestProjections(get().projectionCache, snapshot.available);
+
+      const fresh = teamCountCandidates(snapshot.meta, settings.league.draftType);
+      const previous = get().sessionId === sessionId ? get().teamsCandidates : undefined;
+      const narrowed = previous ? previous.filter((t) => fresh.includes(t)) : fresh;
+      // An empty intersection means a misread somewhere; start over rather than lock in nothing.
+      const teamsCandidates = narrowed.length > 0 ? narrowed : fresh;
+      set({ teamsCandidates });
+
       const state = buildDraftState({
         snapshot,
         index,
@@ -201,6 +211,7 @@ export const useDraftStore = create<DraftStoreState>((set, get) => ({
         platform,
         persistedPicks,
         projectionCache,
+        teamsCandidates,
       });
 
       // A ticking draft clock mutates the DOM every second. Only the parts that

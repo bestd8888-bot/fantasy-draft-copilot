@@ -15,7 +15,7 @@
  * classes ("_ys_9w258l"), so nothing here may depend on those.
  */
 import { parsePositions } from "@/shared/names";
-import type { DraftMeta, PlatformPlayer, Projection } from "@/shared/types";
+import { CATEGORIES, type Category, type DraftMeta, type PlatformPlayer, type Projection } from "@/shared/types";
 import { cleanText } from "./parser";
 
 const POSITION_TEAM_RE = /\b((?:PG|SG|SF|PF|C)(?:\s*,\s*(?:PG|SG|SF|PF|C))*)\s+([A-Z]{2,3})\b/;
@@ -84,6 +84,8 @@ export interface DraftClientSnapshot {
   myRoster: PlatformPlayer[];
   /** The roster panel was located, even if the roster is still empty. */
   rosterPanelFound: boolean;
+  /** Categories the league scores, from the table's columns. */
+  scoredCategories?: Category[];
   meta: DraftMeta;
   warnings: string[];
   tableFound: boolean;
@@ -157,16 +159,34 @@ export function parsePlayerCell(cell: HTMLElement): Omit<PlatformPlayer, "projec
   };
 }
 
+/** Games assumed when a per-game table shows no GP column. */
+const DEFAULT_GAMES = 72;
+
+/**
+ * Builds a per-game projection from whatever stat columns the table has.
+ *
+ * Yahoo only shows the categories a league scores, so a league without TO, or
+ * with offensive/defensive rebounds instead of REB, simply has no such column.
+ * A missing stat is set to 0 for every player, which standardizes to z = 0 —
+ * exactly neutral, the same as the league not scoring it. (An earlier version
+ * required all seven counting columns and silently dropped every row otherwise,
+ * leaving such leagues on ranking-only recommendations.)
+ */
 function projectionFrom(
   values: Partial<Record<keyof Projection, number>>,
   seasonTotals: boolean,
 ): Projection | undefined {
-  const gp = values.gp ?? 0;
-  if (gp <= 0 || COUNTING_STATS.some((key) => values[key] === undefined)) return undefined;
+  const present = COUNTING_STATS.filter((key) => values[key] !== undefined);
+  if (present.length < 3) return undefined;
+
+  // Totals cannot be converted without games played; per-game lines can.
+  const gp = values.gp ?? (seasonTotals ? 0 : DEFAULT_GAMES);
+  if (gp <= 0) return undefined;
 
   const perGame = {} as Projection;
   for (const key of COUNTING_STATS) {
-    perGame[key] = seasonTotals ? values[key]! / gp : values[key]!;
+    const raw = values[key] ?? 0;
+    perGame[key] = seasonTotals ? raw / gp : raw;
   }
   perGame.gp = gp;
   perGame.fgPct = asPercentage(values.fgPct);
@@ -179,7 +199,33 @@ function projectionFrom(
   return perGame;
 }
 
-export function parsePlayersTable(table: HTMLTableElement): { players: PlatformPlayer[]; warnings: string[] } {
+/** Table column label -> the 9-CAT category it scores. */
+const CATEGORY_COLUMNS: Record<string, Category> = {
+  "FG%": "FG%",
+  "FT%": "FT%",
+  "3PTM": "3PM",
+  "3PM": "3PM",
+  PTS: "PTS",
+  REB: "REB",
+  AST: "AST",
+  ST: "STL",
+  STL: "STL",
+  BLK: "BLK",
+  TO: "TO",
+  TOV: "TO",
+};
+
+export interface PlayersTableResult {
+  players: PlatformPlayer[];
+  warnings: string[];
+  /**
+   * Categories this league scores, read from the table's own columns — Yahoo
+   * lists only the scored ones. Undefined when too few were recognized to trust.
+   */
+  scoredCategories?: Category[];
+}
+
+export function parsePlayersTable(table: HTMLTableElement): PlayersTableResult {
   const columns = headerIndexMap(table);
   const warnings: string[] = [];
   const players: PlatformPlayer[] = [];
@@ -234,7 +280,17 @@ export function parsePlayersTable(table: HTMLTableElement): { players: PlatformP
   }
 
   if (players.length === 0) warnings.push("player table found but no rows parsed");
-  return { players, warnings };
+
+  const scored = [...new Set(Object.entries(CATEGORY_COLUMNS).filter(([label]) => columns.has(label)).map(([, c]) => c))];
+  const scoredCategories = scored.length >= 4 ? CATEGORIES.filter((c) => scored.includes(c)) : undefined;
+
+  // Never fail quietly: rows without projections push the engine onto
+  // ranking-only advice, so say which columns were missing.
+  if (players.length > 0 && players.every((p) => !p.projection)) {
+    const labels = [...columns.keys()].join(" ");
+    warnings.push(`球員表格讀不到投影數據（目前欄位：${labels}）—— 請把 stat 下拉選單切到季度投影`);
+  }
+  return { players, warnings, scoredCategories };
 }
 
 /**
@@ -407,7 +463,10 @@ export function parseDraftClient(root: ParentNode = document): DraftClientSnapsh
   if (!table && !status.found) return undefined;
 
   const warnings: string[] = [];
-  const { players, warnings: tableWarnings } = table ? parsePlayersTable(table) : { players: [], warnings: ["player table not found"] };
+  const tableResult: PlayersTableResult = table
+    ? parsePlayersTable(table)
+    : { players: [], warnings: ["player table not found"] };
+  const { players, warnings: tableWarnings, scoredCategories } = tableResult;
   warnings.push(...tableWarnings);
 
   const roster = parseMyRoster(root, table);
@@ -424,6 +483,7 @@ export function parseDraftClient(root: ParentNode = document): DraftClientSnapsh
   return {
     players,
     myRoster,
+    scoredCategories,
     rosterPanelFound: roster.panelFound,
     meta: { ...status.meta, myPickNumbers: myPickNumbers.length ? myPickNumbers : undefined },
     warnings,

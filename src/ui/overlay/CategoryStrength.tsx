@@ -3,6 +3,8 @@ import { CATEGORIES, type Category, type StrategyState } from "@/shared/types";
 interface Props {
   percentiles: Record<Category, number>;
   strategy: StrategyState;
+  /** Categories this league scores; others are not shown. */
+  categories?: Category[];
 }
 
 const BAR_WIDTH = 9;
@@ -13,12 +15,15 @@ function textBar(value: number): string {
   return "█".repeat(filled) + "░".repeat(BAR_WIDTH - filled);
 }
 
-export function CategoryStrength({ percentiles, strategy }: Props) {
+export function CategoryStrength({ percentiles, strategy, categories }: Props) {
+  const shown = categories?.length ? CATEGORIES.filter((c) => categories.includes(c)) : CATEGORIES;
   return (
     <div>
-      <div className="dc-section-title">Category strength（我的隊伍）</div>
+      <div className="dc-section-title">
+        Category strength（我的隊伍）{shown.length !== CATEGORIES.length ? ` · ${shown.length} 項計分` : ""}
+      </div>
       <div className="dc-bars">
-        {CATEGORIES.map((category) => {
+        {shown.map((category) => {
           const value = percentiles[category] ?? 50;
           const punt = strategy.punts[category];
           const modifier = punt !== "none" ? "is-punt" : value >= 70 ? "is-strong" : value <= 35 ? "is-weak" : "";
