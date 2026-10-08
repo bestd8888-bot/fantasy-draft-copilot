@@ -12,6 +12,7 @@ import {
   type StrategyState,
 } from "@/shared/types";
 import { clamp, logistic } from "@/shared/util";
+import { nextPickForSlot } from "@/shared/snake";
 import { buildPoolStats, emptyVector, zScores, type CategoryVector, type PoolStats } from "./zscore";
 import { buildCategoryProfile, detectPunts, puntWeights, type CategoryProfile } from "./punt";
 import { positionScarcity, survivalProbability } from "./scarcity";
@@ -72,6 +73,33 @@ const BASE_VALUE_SPAN = 8;
  */
 const NOTE_INFLUENCE = 0.08;
 
+export interface DecisionHorizon {
+  /** Other managers' picks before the user can next take a player. */
+  picksBefore: number;
+  /** True when the user is picking right now. */
+  onClock: boolean;
+  /** The user picks again immediately after this pick (snake turn). */
+  backToBack: boolean;
+  /** Overall number of the user's following pick, when the slot is known. */
+  followingPick?: number;
+}
+
+export function decisionHorizon(state: DraftState): DecisionHorizon {
+  const league = state.league;
+  if (state.picksUntilMe === undefined) {
+    return { picksBefore: Math.max(1, league.teams - 1), onClock: false, backToBack: false };
+  }
+  if (state.picksUntilMe > 0) {
+    return { picksBefore: state.picksUntilMe, onClock: false, backToBack: false };
+  }
+  const followingPick = state.myDraftSlot
+    ? nextPickForSlot(state.currentPick + 1, state.myDraftSlot, league)
+    : undefined;
+  const picksBefore =
+    followingPick !== undefined ? Math.max(0, followingPick - state.currentPick - 1) : Math.max(1, league.teams - 1);
+  return { picksBefore, onClock: true, backToBack: followingPick !== undefined && picksBefore === 0, followingPick };
+}
+
 export function buildStats(players: Player[], teams: number, availabilityWeight?: number): PoolStats {
   return buildPoolStats(players, teams * 13, availabilityWeight);
 }
@@ -131,11 +159,16 @@ export function recommend(state: DraftState, options: EngineOptions = {}): Engin
   const baseSorted = [...baseZById.values()].sort((a, b) => b - a);
   const puntSorted = [...puntZById.values()].sort((a, b) => b - a);
 
-  const picksUntilMe = state.picksUntilMe ?? 0;
+  // How many other managers pick before the user's next chance at a player.
+  //   - Waiting for my turn:  the picks until then.
+  //   - On the clock:         the picks between THIS pick and my following one,
+  //                           because "can I wait on him?" is the real question.
+  //   - Slot unknown:         the average snake gap.
+  const horizon = decisionHorizon(state);
   const scarcityByPosition = positionScarcity({
     available: pool,
     valueById: puntZById,
-    picksUntilMe,
+    picksUntilMe: horizon.picksBefore,
   });
 
   // Pass 2: components.
@@ -186,7 +219,7 @@ export function recommend(state: DraftState, options: EngineOptions = {}): Engin
 
     const note = notes[player.id];
     const injuryRisk = clamp(injuryRiskScore(player, stats.availabilityWeight) + (note?.risk ? 0.3 : 0));
-    const survival = survivalProbability(player, pool, picksUntilMe, state.currentPick);
+    const survival = survivalProbability(player, pool, horizon.picksBefore, state.currentPick);
     const { improves, hurts } = improvesAndHurts(z, catWeights, categories);
 
     let raw =

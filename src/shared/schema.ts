@@ -92,6 +92,7 @@ export const parserHealthSchema = z.object({
 export const draftStateSchema = z.object({
   platform: z.enum(["yahoo", "mock", "fixture"]),
   sessionId: z.string().min(1),
+  configWarnings: z.array(z.string()).optional(),
   league: leagueSettingsSchema,
   currentRound: z.number().int().min(1),
   currentPick: z.number().int().min(1),

@@ -55,7 +55,13 @@ function topQuality(players: Player[], valueById: Map<string, number>, depth: nu
 }
 
 /**
- * Probability the player is still on the board at the user's next pick.
+ * Probability the player is still on the board the next time the user can take
+ * him.
+ *
+ * `picksBefore` is how many OTHER managers pick in between. Zero means nobody
+ * does — a snake turn — so the player is certain to still be there. (An earlier
+ * version returned 0 here, reading "on the clock" as "now or never"; that showed
+ * 0% for every player at exactly the moment the user was deciding.)
  *
  * Heuristic: rank the remaining pool the way the market drafts it, then ask how
  * far the player sits beyond the number of picks that will happen first.
@@ -63,10 +69,11 @@ function topQuality(players: Player[], valueById: Map<string, number>, depth: nu
 export function survivalProbability(
   player: Player,
   available: Player[],
-  picksUntilMe: number,
+  picksBefore: number,
   currentOverallPick: number,
 ): number {
-  if (picksUntilMe <= 0) return 0; // The user is on the clock: it is now or never.
+  if (picksBefore <= 0) return 0.99;
+  const picksUntilMe = picksBefore;
 
   const marketRank =
     [...available]

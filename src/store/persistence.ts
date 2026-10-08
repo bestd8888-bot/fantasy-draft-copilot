@@ -9,6 +9,7 @@ import {
   type SessionOverrides,
 } from "@/shared/types";
 import { logger } from "@/shared/logger";
+import type { PoolStats } from "@/domain/recommendation/zscore";
 
 export const STORAGE_KEYS = {
   settings: "settings",
@@ -37,6 +38,13 @@ export interface PersistedSession {
    * blind. Survives a tab reload with the rest of the session.
    */
   projections?: Record<string, Projection>;
+  /**
+   * The standardization baseline and the pool it came from. Without these a
+   * mid-draft reload would rebuild the baseline from the depleted board, quietly
+   * inflating every remaining player's z-scores.
+   */
+  stats?: PoolStats;
+  baselinePool?: Player[];
   updatedAt: number;
 }
 

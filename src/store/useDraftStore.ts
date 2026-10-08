@@ -205,13 +205,18 @@ export const useDraftStore = create<DraftStoreState>((set, get) => ({
       // A ticking draft clock mutates the DOM every second. Only the parts that
       // can change a recommendation count as a real change; everything else just
       // refreshes the displayed countdown.
+      //
+      // Identity, not counts: Yahoo's table always shows 100 rows, so when a
+      // player is drafted the next one slides in and the length never changes.
+      // If the table repaints before the "Pick N" label, a count-based check
+      // would keep recommending a player who is already gone.
       const fingerprint = [
         state.currentPick,
-        state.drafted.length,
-        state.myRoster.length,
-        state.available.length,
         state.picksUntilMe,
         state.parserStatus,
+        idHash(state.available),
+        idHash(state.myRoster),
+        state.drafted.length,
       ].join("|");
 
       // Establish the standardization baseline from the first full board we see
@@ -283,6 +288,16 @@ export const useDraftStore = create<DraftStoreState>((set, get) => ({
   },
 }));
 
+/** Order-sensitive djb2 hash of player ids — cheap enough to run on every DOM tick. */
+function idHash(players: { id: string }[]): string {
+  let hash = 5381;
+  for (const player of players) {
+    for (let i = 0; i < player.id.length; i++) hash = ((hash << 5) + hash + player.id.charCodeAt(i)) | 0;
+    hash = ((hash << 5) + hash + 124) | 0; // separator, so ["ab","c"] != ["a","bc"]
+  }
+  return `${players.length}:${(hash >>> 0).toString(36)}`;
+}
+
 /** Remembers every projection the page has shown us, without overwriting on re-render. */
 function harvestProjections(
   cache: Record<string, Projection>,
@@ -298,7 +313,7 @@ function harvestProjections(
 }
 
 async function persist(store: DraftStoreState): Promise<void> {
-  const { state, overrides, sessionId, projectionCache } = store;
+  const { state, overrides, sessionId, projectionCache, stats, baselinePool, players } = store;
   if (!state) return;
   await saveSession({
     sessionId,
@@ -306,6 +321,10 @@ async function persist(store: DraftStoreState): Promise<void> {
     myRosterIds: state.myRoster.map((p) => p.id),
     overrides,
     projections: projectionCache,
+    // Only a baseline derived from the page needs saving; an imported master
+    // pool is rebuilt from the import itself.
+    stats: players.length === 0 ? stats : undefined,
+    baselinePool: players.length === 0 ? baselinePool : undefined,
     updatedAt: Date.now(),
   });
 }
@@ -319,6 +338,9 @@ export async function restoreSession(sessionId: string): Promise<void> {
     overrides: session.overrides ?? { ...EMPTY_OVERRIDES },
     persistedPicks: session.drafted ?? [],
     projectionCache: session.projections ?? {},
+    ...(session.stats && useDraftStore.getState().players.length === 0
+      ? { stats: session.stats, baselinePool: session.baselinePool ?? [] }
+      : {}),
     sessionId,
   });
 }

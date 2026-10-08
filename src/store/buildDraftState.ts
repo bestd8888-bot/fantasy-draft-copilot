@@ -189,6 +189,7 @@ export function buildDraftState(input: BuildInput): DraftState {
   return {
     platform,
     sessionId,
+    configWarnings: leagueSizeWarnings(snapshot.meta, league.teams),
     league,
     currentRound,
     currentPick,
@@ -234,4 +235,28 @@ function mergePlatformPlayer(
     projection: base.projection ?? raw.projection ?? cached,
     tags: base.projection || raw.projection || cached ? base.tags?.filter((t) => t !== "unmatched") : base.tags,
   };
+}
+
+/**
+ * Cross-checks the configured league size against what the page reports.
+ *
+ * "Round R, Pick P" pins the team count: round R spans picks (R-1)T+1 .. RT.
+ * A friend in a 10-team league who never changed the default of 12 would
+ * otherwise get silently wrong slot and snake math with nothing on screen to
+ * suggest it.
+ */
+export function leagueSizeWarnings(
+  meta: { currentRound?: number; currentPick?: number },
+  teams: number,
+): string[] {
+  const round = meta.currentRound;
+  const pick = meta.currentPick;
+  if (!round || !pick || round < 2) return [];
+  const consistent = (round - 1) * teams < pick && pick <= round * teams;
+  if (consistent) return [];
+
+  const candidates: number[] = [];
+  for (let t = 4; t <= 20; t++) if ((round - 1) * t < pick && pick <= round * t) candidates.push(t);
+  const hint = candidates.length ? `（依目前 Round ${round}、Pick ${pick} 推算應為 ${candidates.join(" / ")} 隊）` : "";
+  return [`聯盟隊伍數設定為 ${teams} 隊，但跟選秀室對不上${hint}，請到設定頁修正`];
 }

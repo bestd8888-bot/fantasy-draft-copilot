@@ -118,9 +118,11 @@ describe("recommendation engine", () => {
     expect(top.survivalToNextPick).toBeLessThan(0.5);
   });
 
-  it("is now-or-never when the user is on the clock", () => {
-    const result = recommend(stateWith(demo, [], { picksUntilMe: 0 }));
-    expect(result.recommendations.every((r) => r.survivalToNextPick === 0)).toBe(true);
+  it("on the clock, survival is measured to the following pick (see onclock.test.ts)", () => {
+    // Slot 3 picking at 3 next picks at 22: 18 other managers pick in between.
+    const result = recommend(stateWith(demo, [], { currentPick: 3, picksUntilMe: 0, myDraftSlot: 3 }), { limit: 40 });
+    const survivals = result.recommendations.map((r) => r.survivalToNextPick);
+    expect(survivals.some((s) => s > 0)).toBe(true);
   });
 
   it("falls back to ranking order when no projections exist", () => {

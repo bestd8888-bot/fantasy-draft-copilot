@@ -112,6 +112,8 @@ export interface PlatformPlayer {
 export interface DraftState {
   platform: "yahoo" | "mock" | "fixture";
   sessionId: string;
+  /** Settings that contradict what the page shows — not parser failures. */
+  configWarnings?: string[];
   league: LeagueSettings;
   currentRound: number;
   currentPick: number;

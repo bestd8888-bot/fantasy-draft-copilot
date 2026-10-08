@@ -66,6 +66,9 @@ export function OverlayApp({ mockControls, onOpenInspector }: Props) {
   const missingProjections =
     state.available.length > 0 && state.available.every((p) => !p.projection);
   const recommendations = result?.recommendations ?? [];
+  // Players drafted before the extension saw them have no projection, so the
+  // category bars silently cover only part of the roster unless we say so.
+  const rosterWithoutData = state.myRoster.filter((p) => !p.projection).length;
   const best = recommendations[0];
   const selected = recommendations.find((r) => r.playerId === selectedPlayerId);
 
@@ -114,6 +117,17 @@ export function OverlayApp({ mockControls, onOpenInspector }: Props) {
         {stale && (
           <div className="dc-banner dc-banner-warn" role="status">
             ⚠️ Draft data may be stale — Yahoo page structure changed (confidence {health.confidence.toFixed(2)})
+          </div>
+        )}
+        {(state.configWarnings ?? []).map((warning) => (
+          <div className="dc-banner dc-banner-error" key={warning} role="alert">
+            {warning}
+          </div>
+        ))}
+        {rosterWithoutData > 0 && (
+          <div className="dc-banner dc-banner-info">
+            你的陣容有 {rosterWithoutData} 名球員沒有數據（外掛啟動前就被選走），Category 強弱只計算{" "}
+            {state.myRoster.length - rosterWithoutData} 名。
           </div>
         )}
         {health.warnings.slice(0, 2).map((warning) => (
