@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Fantasy Draft AI Copilot",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Read-only Yahoo Fantasy Basketball draft room copilot: live 9-CAT recommendations, punt detection and roster fit.",
   "minimum_chrome_version": "114",
   "permissions": [
